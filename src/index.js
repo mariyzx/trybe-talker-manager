@@ -1,6 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const crypto = require('crypto');
+
+let token;
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,5 +42,13 @@ app.get('/talker/:id', (req, res) => {
     res.status(200).json(filteredTalker);
   } else {
     res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  }
+});
+
+app.post('/login', (req, res) => {
+  const requiredProperties = ['email', 'password'];
+  if (requiredProperties.every((prop) => prop in req.body)) {
+    token = crypto.randomBytes(8).toString('hex');
+    res.status(200).json({ token });
   }
 });
