@@ -30,3 +30,14 @@ app.get('/talker', (_req, res) => {
   const result = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
   res.status(200).json(result);
 });
+
+app.get('/talker/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
+  const filteredTalker = data.find((t) => t.id === id);
+  if (filteredTalker) {
+    res.status(200).json(filteredTalker);
+  } else {
+    res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+  }
+});
