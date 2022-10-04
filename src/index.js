@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const validateLogin = require('./middlewares');
 
 let token;
 
@@ -45,9 +46,29 @@ app.get('/talker/:id', (req, res) => {
   }
 });
 
+const returnEmail = (res, erro) => {
+  if (erro === '"email" must be a valid email') {
+    return res.status(400).json({ message: 'O "email" deve ter o formato "email@email.com"' });
+  } 
+    return res.status(400).json({ message: 'O campo "email" é obrigatório' });
+};
+
+const returnPassword = (res, erro) => {
+  console.log(erro);
+  if (erro === '"password" length must be at least 6 characters long') {
+    return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
+  } if (erro === '"password" is required') {
+  return res.status(400).json({ message: 'O campo "password" é obrigatório' });
+  }
+};
+
 app.post('/login', (req, res) => {
-  const requiredProperties = ['email', 'password'];
-  if (requiredProperties.every((prop) => prop in req.body)) {
+  const { error } = validateLogin(req.body);
+  if (error && error.details[0].message.includes('email')) {
+    returnEmail(res, error.details[0].message);
+  } else if (error && error.details[0].message.includes('password')) {
+    returnPassword(res, error.details[0].message);
+  } else {
     token = crypto.randomBytes(8).toString('hex');
     res.status(200).json({ token });
   }
