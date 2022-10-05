@@ -13,6 +13,7 @@ const { validateLogin,
 
 let token;
 const PATH = 'src/talker.json';
+const data = JSON.parse(fs.readFileSync(PATH, 'utf-8'));
 
 const app = express();
 app.use(bodyParser.json());
@@ -45,7 +46,6 @@ app.get('/talker', (_req, res) => {
 
 app.get('/talker/:id', (req, res) => {
   const id = Number(req.params.id);
-  const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
   const filteredTalker = data.find((t) => t.id === id);
   if (filteredTalker) {
     res.status(200).json(filteredTalker);
@@ -90,9 +90,34 @@ app.post('/talker',
   validateWatchedAt,
   (req, res) => {
   const { name, age, talk } = req.body;
-  const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
   const newTalker = { id: data.length + 1, name, age, talk };
   data.push(newTalker);
   fs.writeFileSync('src/talker.json', JSON.stringify([newTalker]));
   res.status(201).json(newTalker);
+});
+
+app.put('/talker/:id', 
+  validateAuthorization,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateRate,
+  validateWatchedAt, (req, res) => {
+  const id = Number(req.params.id);
+  const newJson = data.filter((a) => a.id !== id);
+  const updated = { id, ...req.body };
+  newJson.push(updated);
+  fs.writeFileSync('src/talker.json', JSON.stringify(newJson));
+  res.status(200).json(updated);
+});
+
+app.delete('/talker/:id', validateAuthorization, (req, res) => {
+  const id = Number(req.params.id);
+  const filteredTalker = data.find((t) => t.id === id);
+  if (filteredTalker) {
+    const i = data.indexOf(filteredTalker);
+    data.splice(i, 1);
+    fs.writeFileSync('src/talker.json', JSON.stringify(data));
+    res.status(204).json();
+  }
 });
