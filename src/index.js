@@ -2,9 +2,17 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const crypto = require('crypto');
-const validateLogin = require('./middlewares');
+const { validateLogin, 
+        validateAuthorization,
+        validateName,
+        validateAge,
+        validateTalk,
+        validateWatchedAt,
+        validateRate,
+      } = require('./middlewares');
 
 let token;
+const PATH = 'src/talker.json';
 
 const app = express();
 app.use(bodyParser.json());
@@ -24,14 +32,14 @@ app.listen(PORT, () => {
 // Caso haja pessoas cadastradas
 
 app.get('/talker', (_req, res) => {
-  const result = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
+  const result = JSON.parse(fs.readFileSync(PATH, 'utf-8'));
   res.status(200).json(result);
 });
 
 // Caso nao haja pessoas cadastradas
 
 app.get('/talker', (_req, res) => {
-  const result = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
+  const result = JSON.parse(fs.readFileSync(PATH, 'utf-8'));
   res.status(200).json(result);
 });
 
@@ -54,7 +62,6 @@ const returnEmail = (res, erro) => {
 };
 
 const returnPassword = (res, erro) => {
-  console.log(erro);
   if (erro === '"password" length must be at least 6 characters long') {
     return res.status(400).json({ message: 'O "password" deve ter pelo menos 6 caracteres' });
   } if (erro === '"password" is required') {
@@ -72,4 +79,20 @@ app.post('/login', (req, res) => {
     token = crypto.randomBytes(8).toString('hex');
     res.status(200).json({ token });
   }
+});
+
+app.post('/talker',
+  validateAuthorization,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateRate,
+  validateWatchedAt,
+  (req, res) => {
+  const { name, age, talk } = req.body;
+  const data = JSON.parse(fs.readFileSync('src/talker.json', 'utf-8'));
+  const newTalker = { id: data.length + 1, name, age, talk };
+  data.push(newTalker);
+  fs.writeFileSync('src/talker.json', JSON.stringify([newTalker]));
+  res.status(201).json(newTalker);
 });
