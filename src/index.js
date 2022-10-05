@@ -44,6 +44,12 @@ app.get('/talker', (_req, res) => {
   res.status(200).json(result);
 });
 
+app.get('/talker/search', validateAuthorization, (req, res) => {
+  const { q } = req.query;
+  const filteredTalker = data.filter((talker) => talker.name.includes(q));
+  res.status(200).json(filteredTalker);
+});
+
 app.get('/talker/:id', (req, res) => {
   const id = Number(req.params.id);
   const filteredTalker = data.find((t) => t.id === id);
