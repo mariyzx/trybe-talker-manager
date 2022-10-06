@@ -6,6 +6,8 @@ Nesse projeto foi desenvolvido uma aplicação de cadastro de palestrantes em qu
 
 O projeto Talker Manager foi desenvolvido por [Mariana Werneck](https://www.linkedin.com/in/marinhomariana8/) durante o curso de Desenvolvimento Web na [Trybe](https://www.betrybe.com/)! Foi adquirido 100% do projeto total.
 
+<img src="https://user-images.githubusercontent.com/69324347/194384333-15fc1721-658d-42ec-bb01-c39e95ce94ad.jpg" width="500px">
+
 ## Como utilizar:
 
 <p>Clone o repositório: <code>git@github.com:mariyzx/trybe-talker-manager.git</code>.</p>
